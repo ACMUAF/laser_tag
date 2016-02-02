@@ -82,9 +82,11 @@ module handle(head_size_x=40,posx=0)
                 translate([-22.5,-40,0])cube([45,75,75]);
                     //rotate([0,0,180]) translate([-77,75,-42])  
                 union(){
-                            rotate([0,0,180]) translate([-77,75,-42]) import(                           "D:/Oscad/Parts/star_trek/Phase_Pistol_Grip.stl",convexity=10);
+                            rotate([0,0,180]) translate([-77,75,-42]) import("/Users/nicolaussegler/Desktop/Gitrepos/laser_tag/Parts/component/Phase_Pistol_Grip.stl");
+
                     
                     
+
                 
                         }
                         
@@ -177,9 +179,9 @@ module cover(w=50, l=90, depth=W_T, h_rad=1)
     {
         union()
         {
-            cube([w,l,depth/2],center=true);
+            cube([w,l,depth/2+.01],center=true);
 
-            translate([0,0,depth/2]) cube([w-W_T*2,l-W_T*2,depth/2],center=true);
+            translate([0,0,depth/2]) cube([w-W_T*2,l-W_T*2,depth/2+.01],center=true);
             
            
         }
