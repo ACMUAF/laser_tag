@@ -5,14 +5,63 @@
   Dr. Orion Lawlor, lawlor@alaska.edu, 2016-02-01 (public domain)
 */
 
-wall=2; // wall thickness
-f=5; // chamfer radius--round corners by this much
 dz=0.3; // size of 3D printer's layers (smaller == slower!)
 
-// Simple filleted 2D outline
-module shapey_2D() {
+ // Round off this 2D shape
+ module round_2D(f=5.0) {
     offset(r=f) offset(r=-f) // rounds outside corners
     offset(r=-f) offset(r=f) // rounds inside corners
+     children();
+ }
+ 
+ // Create a rounded 3D profile of this 2D shape.
+ module round_3D_floor(h,f,wall) {
+     fi=f-wall; // inside radius
+     fo=f; // outside radius
+     
+     // Fillets and floor: stepwise for 3D printer layers (lame hack!)
+     for (z=[dz:dz:fo+dz]) {
+         translate([0,0,z-dz])
+         linear_extrude(height=dz,convexity=10) 
+         difference() {
+             // Outside of floor
+             offset(r=-fo+fo*sqrt(1-pow(1-z/fo,2))) 
+                children();
+             // Inside of floor
+             offset(r=-fi+fi*sqrt(1-pow(1-(z-wall)/fi,2))-wall) 
+                children();
+         }
+     }
+ }
+ 
+ // Create a rounded 3D extrusion of the outside of this shape
+ module round_3D_wall(h,f,wall) {
+     linear_extrude(height=h,convexity=10) 
+        difference() { 
+            children();  // outside of walls
+            offset(r=-wall) children();  // inside of walls
+        }
+ }
+ 
+ // Extrude 2D child up into walled shape of this height
+ module round_3D_closed(h,f,wall) {
+     
+     // Walls:
+     translate([0,0,f])
+        round_3D_wall(h-2*f,f,wall) 
+            children();
+     
+     // Floor:
+     round_3D_floor(h,f,wall) children();
+     
+     // Ceiling:
+     translate([0,0,h])
+        scale([1,1,-1]) // flip Z
+            round_3D_floor(h,f,wall) children();
+}
+
+// Simple filleted 2D outline (demo shape)
+module shapey_2D() {
     difference() {
         union() 
          {
@@ -23,36 +72,16 @@ module shapey_2D() {
      }
  }
  
- // Extruded up into walled shape
- module shapey_3D() {
-     // outside of shape (simple version)
-     // linear_extrude(height=wall) shapey_2D();
-     
-     fo=f+wall; // outside radius
-     
-     // Walls:
-     translate([0,0,fo])
-     linear_extrude(height=40,convexity=10) 
-        difference() { 
-            shapey_2D();  // outside of walls
-            offset(r=-wall) shapey_2D();  // inside of walls
-        }
-     
-     // Fillets and floor: stepwise for 3D printer layers (lame hack!)
-     for (z=[dz:dz:fo+dz]) {
-         translate([0,0,z-dz])
-         linear_extrude(height=dz,convexity=10) 
-         difference() {
-             // Outside of floor
-             offset(r=-fo+fo*sqrt(1-pow(1-z/fo,2))) shapey_2D();
-             // Inside of floor
-             offset(r=-f+f*sqrt(1-pow(1-(z-wall)/f,2))-wall) shapey_2D();
-         }
-     }
- }
  
+ // Use these tools on the shape:
  difference() {
-    shapey_3D();
-     //translate([-1,-1,-1])
-    //cube([50,50,50]);
+    f=5;
+    round_3D_closed(50,f,2) 
+        // round_2D(f) 
+            shapey_2D();
+    
+    translate([-1,-1,-1])
+        cube([25,80,25]);
  }
+
+ 
