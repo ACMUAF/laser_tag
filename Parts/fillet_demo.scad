@@ -75,9 +75,9 @@ module shapey_2D() {
  
  // Use these tools on the shape:
  difference() {
-    f=5;
+    f=4;
     round_3D_closed(50,f,2) 
-        // round_2D(f) 
+        round_2D(f) 
             shapey_2D();
     
     translate([-1,-1,-1])
