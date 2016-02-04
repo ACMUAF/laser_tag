@@ -1,9 +1,30 @@
 Cheap Arduino Nano - http://www.ebay.com/itm/262123424219
+	What makes these cheap is the USB to serial converter, a CH340G:
+	It will work fine on Linux, but needs drivers on Windows, and is problematic on OS X.
+
+USB A to mini B cable - http://www.ebay.com/itm/221446846293
+	Needed to flash the Nano, and to power it from the charger.
+
 IR Receivers - http://www.digikey.com/product-search/en?keywords=TSSP58038-ND
+	This TSSP58038 seems to work, but Dr. Lawlor has only tested the TSOP38228.
+
 IR Emitters (30 Degree) - http://www.digikey.com/product-search/en?keywords=751-1203-ND
+
 IR Emitters (6 Degree) - http://www.digikey.com/product-search/en?keywords=475-2919-ND
+
 18650 Lithium Batteries - http://www.ebay.com/itm/291656146289
-Charger/Booster Board - http://www.ebay.com/itm/131657011591
+	These single-cell round lithium batteries look like an overgrown AA.  The knockoff claimed capacities are way bigger than reality, normally about 1000mAh.
+
+Charger/Booster Board - http://www.ebay.com/itm/361388752607
+	This square "Power Bank" is a generic USB charger for 18650 lithium batteries, and a boost converter to output 5V from the battery.
+
 Cheap Sound Board- http://www.ebay.com/itm/310629013078
 	-Note - Needs 2 gb Sandisk micro SD card (ONLY THIS CARD WORKS)
+
 2 GB Sandisk Micro SD Card - http://www.ebay.com/itm/191719321545
+
+Speaker / piezo?
+
+Neopixels?
+
+
