@@ -24,10 +24,10 @@ handle();
 translate([-20,-20,99])  body();
 
 
- translate([-3,10,75]) trigger();
+translate([-3,10,75]) trigger();
 
 //used to hold body on the handle
-translate([-16.5,-20,99]) locking_key();
+//translate([-16.5,-20,99]) locking_key();
 
 translate([-20,-21,100]) fire_chamber(); 
 
@@ -193,7 +193,6 @@ module cover(w=50, l=90, depth=W_T, h_rad=1)
         }
     }
 }
-cover();
 
 module peg_screw(height=40,radius=5)
 {
