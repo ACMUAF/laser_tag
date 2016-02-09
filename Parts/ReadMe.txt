@@ -15,3 +15,11 @@ All files are currently .3mf
 Parts may need adjustment after printing
 
 component/Phase_Pistol_Grip.stl should not be printed alone
+
+
+
+///
+///
+///
+
+Change bodyLength at top of file to change the length of the gun body 

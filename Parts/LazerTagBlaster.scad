@@ -10,6 +10,7 @@
 // show_parts=true;
  show_parts=false;
 
+bodyLength=100;
 
 //uncoment for parts for object parts
 
@@ -179,9 +180,9 @@ module cover(w=50, l=90, depth=W_T, h_rad=1)
     {
         union()
         {
-            cube([w,l,depth/2+.01],center=true);
+            translate([-0.5,0,0]) cube([w,l,(depth)/2+.01]);
 
-            translate([0,0,depth/2]) cube([w-W_T*2,l-W_T*2,depth/2+.01],center=true);
+            translate([W_T,W_T,depth/2]) cube([w-W_T*2,l-W_T*2,(depth+2)/2]);
             
            
         }
@@ -192,7 +193,7 @@ module cover(w=50, l=90, depth=W_T, h_rad=1)
         }
     }
 }
-
+cover();
 
 module peg_screw(height=40,radius=5)
 {
@@ -229,7 +230,7 @@ module twin_plate_screw(height=10,head_rad=10,body_rad=5)
     }
 }
 
-module body(posx=0,posy=0,posz=0,head_size_x=40,head_size_y=90,head_size_z=35,body_size_y=120,nose_size_y=40)
+module body(posx=0,posy=0,posz=0,head_size_x=40,head_size_y=90,head_size_z=35,body_size_y=bodyLength,nose_size_y=40)
 {
     //head
     difference()
@@ -308,7 +309,7 @@ module body(posx=0,posy=0,posz=0,head_size_x=40,head_size_y=90,head_size_z=35,bo
                 
                 //cover hole
                 
-                translate([1,145,0]) rotate([0,90,0]) cover(l=105);
+                translate([-.5,head_size_y+10,head_size_z-10]) rotate([0,90,0]) cover(l=body_size_y-20);
                 
                 
                 
@@ -320,10 +321,10 @@ module body(posx=0,posy=0,posz=0,head_size_x=40,head_size_y=90,head_size_z=35,bo
     
     
         //large chamber corners
-        r_corner(posx=0,posy=posy+head_size_y,posz=35,c_l=120);
-        r_corner(posx=30,posy=posy+head_size_y,posz=35,c_l=120, quad=1);
-        r_corner(posx=30,posy=posy+head_size_y,posz=posz-25,c_l=120, quad=2);
-        r_corner(posx=0,posy=posy+head_size_y,posz=posz-25,c_l=120, quad=3);
+        r_corner(posx=0,posy=posy+head_size_y,posz=35,c_l=body_size_y);
+        r_corner(posx=30,posy=posy+head_size_y,posz=35,c_l=body_size_y, quad=1);
+        r_corner(posx=30,posy=posy+head_size_y,posz=posz-25,c_l=body_size_y, quad=2);
+        r_corner(posx=0,posy=posy+head_size_y,posz=posz-25,c_l=body_size_y, quad=3);
         r_corner(posx=30,posy=posy+head_size_y,posz=posz-25,c_l=head_size_x-10, quad=3,rot=1,thickness=10);        
         r_corner(posx=0,posy=posy+head_size_y,posz=posz-25,c_l=head_size_x-5, quad=2,rot=2,up=3,thickness=10);        
         r_corner(posx=30,posy=posy+head_size_y,posz=posz-25,c_l=head_size_x-5, quad=2,rot=3,up=3,thickness=10); 
