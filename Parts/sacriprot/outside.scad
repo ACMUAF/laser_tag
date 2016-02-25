@@ -3,6 +3,10 @@
 */
 include <roundlib.scad>;
 
+
+show_halves=false;
+show_collimator=true;
+
 // Smoothness:
 $fa=8; $fs=0.1;
 
@@ -32,7 +36,7 @@ cavity_x_end=100; // nano is 45mm long, lots of extra space here
 
 // Emitter LED:
 LED_dia=6;
-LED_height=8;
+LED_height=8; // includes extra for legs to fit inside
 
 // Collimator to channel LED light only straight forward:
 baffle_height=20;
@@ -105,12 +109,43 @@ module electronics_outline() {
     }
 }
 
-// Infrared collimator (outside size)
+
+// Infrared beam collimator (outside size)
 module collimator(rplus,hplus) {
     translate([collimator_x_start,cavity_y/2,0])
     rotate([0,90,0])
         cylinder(d=collimator_dia+2*rplus,h=collimator_height+hplus);
 }
+
+// Infrared collimator (actual printable version)
+module collimator_printable() {
+    thru_dia=3.0; 
+    difference() {
+        // Outside body:
+        cylinder(d=collimator_dia,h=collimator_height,$fa=4);
+        
+        // Thru hole:
+        cylinder(d=thru_dia,h=collimator_height+2*epsilon);
+        
+        // LED area:
+        translate([0,0,-epsilon])
+            cylinder(d=LED_dia,h=LED_height+2*epsilon);
+        
+        // Baffles to reduce reflections:
+        baffle_z_start=LED_height+wall;
+        baffle_z_end=collimator_height;
+        baffle_spacing=(baffle_z_end-baffle_z_start)/4;
+        for (baffle=[baffle_z_start:baffle_spacing:baffle_z_end-epsilon])
+            translate([0,0,baffle])
+                cylinder(d=LED_dia,h=baffle_spacing-wall);
+        
+        // cutaway cube (for debug only)
+        //cube([100,100,100]);
+    }
+}
+
+// Collimator should be printed in IR-opaque black filament
+if (show_collimator) collimator_printable();
 
 // Housing to hold collimator
 module collimator_housing() {
@@ -310,12 +345,13 @@ module laser_top() {
 }
 
 // Printable halves:
+if (show_halves) {
+    laser_bottom();
 
-laser_bottom();
-
-translate([120,-70,0]) 
-    rotate([0,180,-90+grip_angle]) 
-        laser_top();
+    translate([120,-70,0]) 
+        rotate([0,180,-90+grip_angle]) 
+            laser_top();
+}
 
 // Test: build plate of Makerbot replicator (to make sure everything fits)
 // translate([50,-40,-height/2-wall]) square([225,145],center=true);
