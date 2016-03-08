@@ -3,12 +3,26 @@
 */
 include <roundlib.scad>;
 
+
+//usb hole
+//x4.5
+//y8.5
+#translate([-22.5,9,-7]) cube([2.5,8.6,4.5]);
+
+//switch hole
+//y =8.6 ~
+//x =4.5
+#translate([9,-10,-15]) cube([4.5,8.6,2.5]);
+
+
+
+
 //motor size 
 motor_x = 17;
 motor_z = 22;
 motor_y = 40; 
 
-translate([-65,-63,-motor_z/2]) rotate([0,0,grip_angle]) cube([motor_x,motor_y,motor_z]);
+#translate([-65,-63,-motor_z/2]) rotate([0,0,grip_angle]) cube([motor_x,motor_y,motor_z]);
 
 show_halves=false;
 
