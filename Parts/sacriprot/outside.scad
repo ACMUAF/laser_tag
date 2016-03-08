@@ -3,12 +3,19 @@
 */
 include <roundlib.scad>;
 
+//motor size 
+motor_x = 17;
+motor_z = 22;
+motor_y = 40; 
+
+translate([-65,-63,-motor_z/2]) rotate([0,0,grip_angle]) cube([motor_x,motor_y,motor_z]);
 
 show_halves=false;
-show_collimator=true;
+
+show_collimator=false;
 
 // Smoothness:
-$fa=8; $fs=0.1;
+$fa=20; $fs=0.1;
 
 // Thickness of exterior walls
 wall=2.0;
@@ -109,7 +116,7 @@ module electronics_outline() {
     }
 }
 
-
+//electronics_outline();
 // Infrared beam collimator (outside size)
 module collimator(rplus,hplus) {
     translate([collimator_x_start,cavity_y/2,0])
@@ -173,7 +180,7 @@ module hollow_2D() {
         electronics_outline();
     }
 }
-
+//linear_extrude() hollow_2D();
 // Exterior outline:
 module outside_2D() {
     union() {
@@ -188,7 +195,7 @@ module outside_2D() {
                     scale([-0.47,-0.87])
                         circle(d=100);
                     // Back of grip:
-                    translate([-10,-10])
+                    translate([-11,-10])
                     scale([-0.45,-0.75])
                         circle(d=100);
                 }
@@ -203,7 +210,7 @@ module outside_2D() {
     }
 }
 
-
+//linear_extrude()  outside_2D();
 // Overall laser plus, step 1 (overall frame exterior)
 module laser_plus() {
     intersection() {
@@ -239,7 +246,7 @@ module laser_plus() {
         }
     }
 }
-
+laser_minus();
 // Overall laser minus, step 1 (major component holes here)
 module laser_minus() {
     // Main electronics housing
@@ -278,7 +285,7 @@ module laser_plus2() {
     collimator_housing();
 
 }
-
+laser_plus2();
 // Laser removals, phase 2
 module laser_minus2() {
     // Mounting screws
