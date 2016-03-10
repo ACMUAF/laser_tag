@@ -3,30 +3,20 @@
 */
 include <roundlib.scad>;
 
+show_halves=true;
 
-//usb hole
-//x4.5
-//y8.5
-#translate([-22.5,9,-7]) cube([2.5,8.6,4.5]);
+//outside_2D();
 
-//switch hole
-//y =8.6 ~
-//x =4.5
-#translate([9,-10,-15]) cube([4.5,8.6,2.5]);
+show_collimator=false;
 
-
-
+//port holes
+misc_hole_w = 4.5;
+misc_hole_h = 8.7;
 
 //motor size 
 motor_x = 17;
 motor_z = 22;
 motor_y = 40; 
-
-#translate([-65,-63,-motor_z/2]) rotate([0,0,grip_angle]) cube([motor_x,motor_y,motor_z]);
-
-show_halves=false;
-
-show_collimator=false;
 
 // Smoothness:
 $fa=20; $fs=0.1;
@@ -194,7 +184,20 @@ module hollow_2D() {
         electronics_outline();
     }
 }
-//linear_extrude() hollow_2D();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // Exterior outline:
 module outside_2D() {
     union() {
@@ -202,7 +205,7 @@ module outside_2D() {
         
         difference() { // finger ridges
             // Big circle on back of grip:
-            translate([-25,-50])
+            translate([-27,-50,0]) scale([1.3,1,1])
                 rotate([0,0,grip_angle])
                 union() {
                     // Front of grip:
@@ -224,7 +227,7 @@ module outside_2D() {
     }
 }
 
-//linear_extrude()  outside_2D();
+
 // Overall laser plus, step 1 (overall frame exterior)
 module laser_plus() {
     intersection() {
@@ -248,7 +251,7 @@ module laser_plus() {
                 // Add cylinder to trim down the grip:
                 rotate([0,0,grip_angle])
                     translate([-15,-110])
-                        scale([0.95,1,0.8])
+                        scale([1.4,1,0.8])
                             rotate([-90,0,0])
                                 cylinder(d=50,h=120);
                 
@@ -260,7 +263,6 @@ module laser_plus() {
         }
     }
 }
-laser_minus();
 // Overall laser minus, step 1 (major component holes here)
 module laser_minus() {
     // Main electronics housing
@@ -299,7 +301,7 @@ module laser_plus2() {
     collimator_housing();
 
 }
-laser_plus2();
+
 // Laser removals, phase 2
 module laser_minus2() {
     // Mounting screws
@@ -321,6 +323,17 @@ module laser_minus2() {
     translate([0,0,-height/2])
         linear_extrude(height=height,convexity=4) 
             round_2D(1.0) charger_outline();
+    
+    //port holes for usb and power switch
+    translate([-22.5,9,-7]) cube([wall+0.5,misc_hole_h,misc_hole_w]);
+
+    translate([9,-10,-15]) cube([misc_hole_w,misc_hole_h,wall+0.5]);
+
+    //motor hole
+    translate([-65,-66,-motor_z/2]) rotate([0,0,grip_angle])   cube([motor_x,motor_y,motor_z]);
+    //wires fir the motor
+    translate([-60+motor_x,-77+motor_y,0]) cube([10,5,5]);
+
 }
 
 // Overall laser (as a monolithic block)
