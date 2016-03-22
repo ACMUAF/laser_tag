@@ -5,7 +5,24 @@ include <roundlib.scad>;
 
 show_halves=true;
 
-//outside_2D();
+//laser_plus();
+
+//sight();
+
+module sight_cube(){
+    translate([-40,58,-22]) rotate([45,0,0]) cube([400,30,30]);
+}
+module sight(){
+    difference()
+    {
+        intersection(){
+            sight_cube();
+            outside_3D();
+        }
+        translate([0,5,0]) sight_cube();
+    }
+}
+
 
 show_collimator=false;
 
@@ -106,6 +123,9 @@ module electronics_outline() {
             round_2D(8.0) 
             translate([cavity_x_start,0,0])         
                 square([cavity_x_end-cavity_x_start,cavity_y]);
+            
+            //top hump
+            translate([47,25,0]) scale([3.3,1.2,1]) circle(d=40);
             
             // Reinforcing behind trigger:
             translate([trigger_x_start-wall,0,0])
@@ -227,40 +247,47 @@ module outside_2D() {
     }
 }
 
+module outside_3D() {
+    translate([0,0,-height/2-wall]) linear_extrude(height=height+2*wall,convexity=10) 
+                outside_2D();
+}
+
 
 // Overall laser plus, step 1 (overall frame exterior)
 module laser_plus() {
-    intersection() {
-        // Overall outline:
-        translate([0,0,-height/2-wall])
-            linear_extrude(height=height+2*wall,convexity=10) 
-                outside_2D();
-        
-        // Trim down the grip area
-        union() {
-            // Ignore the top half
-            translate([-20-wall,-wall,-100])
-                cube([200,200,200]);
-            
-            // Ignore the right half
-            translate([-10,-25,-100])
-                rotate([0,0,grip_angle])
-                cube([200,200,200]);
+    union()
+    {
 
-            difference() {
-                // Add cylinder to trim down the grip:
-                rotate([0,0,grip_angle])
-                    translate([-15,-110])
-                        scale([1.4,1,0.8])
-                            rotate([-90,0,0])
-                                cylinder(d=50,h=120);
+            // Overall outline:
+            outside_3D()
+        
+            // Trim down the grip area
+            union() {
+                // Ignore the top half
+                translate([-20-wall,-wall,-100])
+                    cube([200,200,200]);
+            
+                // Ignore the right half
+                translate([-10,-25,-100])
+                    rotate([0,0,grip_angle])
+                    cube([200,200,200]);
+
+                difference() {
+                    // Add cylinder to trim down the grip:
+                    rotate([0,0,grip_angle])
+                        translate([-15,-110])
+                            scale([1.4,1,0.8])
+                                rotate([-90,0,0])
+                                    cylinder(d=50,h=120);
                 
-                // Round off backstrap area
-                for (side=[-1,+1]) scale([1,1,side])
-                    translate([-73,0,0])
-                    rotate([0,45,0]) cylinder(d=50,h=50);
+                    // Round off backstrap area
+                    for (side=[-1,+1]) scale([1,1,side])
+                        translate([-73,0,0])
+                        rotate([0,45,0]) cylinder(d=50,h=50);
+                
+                
+                }
             }
-        }
     }
 }
 // Overall laser minus, step 1 (major component holes here)
@@ -299,7 +326,7 @@ module laser_plus2() {
         }
     
     collimator_housing();
-
+    sight();
 }
 
 // Laser removals, phase 2
@@ -333,7 +360,8 @@ module laser_minus2() {
     translate([-65,-66,-motor_z/2]) rotate([0,0,grip_angle])   cube([motor_x,motor_y,motor_z]);
     //wires fir the motor
     translate([-60+motor_x,-77+motor_y,0]) cube([10,5,5]);
-
+    
+    translate([0,1.5*wall,0])sight_cube();
 }
 
 // Overall laser (as a monolithic block)
@@ -352,8 +380,9 @@ module laser() {
 
 // Slicing surface to extract top half of laser
 module laser_slice_top(extra_inside=0.0) {
-    slice_z=trigger_hole_z/2-epsilon;
+    //slice_z=trigger_hole_z/2-epsilon;
     bump_z=wall/2;
+    slice_z=0+bump_z/2;
     // Big cube:
     translate([-100,-100,slice_z])
         cube([300,200,200]);
