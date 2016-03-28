@@ -3,6 +3,10 @@
 */
 include <roundlib.scad>;
 
+// Smoothness:
+$fa=20; $fs=0.1; // coarse & fast
+$fa=5; $fs=0.1; // fine & slow
+
 show_halves=true;
 
 //laser_plus();
@@ -35,11 +39,20 @@ motor_x = 17;
 motor_z = 22;
 motor_y = 40; 
 
-// Smoothness:
-$fa=20; $fs=0.1;
 
 // Thickness of exterior walls
 wall=2.0;
+
+// Thickness of clear acrylic insert
+acrylic_thick=2.3;
+
+// Start and size of acrylic insert
+acrylic_size_x=30;
+acrylic_size_y=30;
+acrylic_x=88;
+acrylic_y=21;
+acrylic_hole_dx=10; // location of mounting hole in acrylic panel
+acrylic_hole_dy=15; // location of mounting hole in acrylic panel
 
 // Interior height of electronics cavities
 //   Need at least 25mm for the charger box
@@ -78,9 +91,10 @@ epsilon=0.05;
 
 // Mounting screw center positions:  [X,Y,angle]
 mounting_screws=[
-    [-52,-75,90+grip_angle], // back of grip
+    [-55,-85,90+grip_angle], // back of grip
     [trigger_x_start+8,2.5,0], // trigger (also trigger pivot)
     [cavity_x_end-1,0,90], // front
+	[acrylic_x+acrylic_hole_dx,acrylic_y+acrylic_hole_dy,-30]
 ];
 
 // Battery pack:
@@ -186,8 +200,8 @@ module collimator_housing() {
             collimator(0.5+wall,10.0);
         
         // Trim edge of collimator to outside of gun
-        translate([0,0,-25])
-            linear_extrude(height=27) outside_2D();
+        translate([0,0,-height/2+epsilon])
+            linear_extrude(height=height) outside_2D();
     }
         
     // Support rib below collimator
@@ -252,42 +266,44 @@ module outside_3D() {
                 outside_2D();
 }
 
+// Intersection to trim and bevel the grip area
+module grip_trim() {
+	union() {
+		// Ignore the top half
+		translate([-20-wall,-wall,-100])
+			cube([200,200,200]);
+	
+		// Ignore the right half
+		translate([-10,-25,-100])
+			rotate([0,0,grip_angle])
+			cube([200,200,200]);
+
+		difference() {
+			// Add cylinder to trim down the grip:
+			rotate([0,0,grip_angle])
+				translate([-23,-110])
+					scale([1.25,1,0.8])
+						rotate([-90,0,0])
+							cylinder(d=50,h=120);
+		
+			// Round off backstrap area
+			for (side=[-1,+1]) scale([1,1,side])
+				translate([-74,0,0])
+				rotate([0,45,0]) cylinder(d=50,h=50);
+		}
+	}
+}
 
 // Overall laser plus, step 1 (overall frame exterior)
 module laser_plus() {
-    union()
+    intersection()
     {
 
             // Overall outline:
-            outside_3D()
+            outside_3D();
         
             // Trim down the grip area
-            union() {
-                // Ignore the top half
-                translate([-20-wall,-wall,-100])
-                    cube([200,200,200]);
-            
-                // Ignore the right half
-                translate([-10,-25,-100])
-                    rotate([0,0,grip_angle])
-                    cube([200,200,200]);
-
-                difference() {
-                    // Add cylinder to trim down the grip:
-                    rotate([0,0,grip_angle])
-                        translate([-15,-110])
-                            scale([1.4,1,0.8])
-                                rotate([-90,0,0])
-                                    cylinder(d=50,h=120);
-                
-                    // Round off backstrap area
-                    for (side=[-1,+1]) scale([1,1,side])
-                        translate([-73,0,0])
-                        rotate([0,45,0]) cylinder(d=50,h=50);
-                
-                
-                }
-            }
+            grip_trim();
     }
 }
 // Overall laser minus, step 1 (major component holes here)
@@ -352,16 +368,31 @@ module laser_minus2() {
             round_2D(1.0) charger_outline();
     
     //port holes for usb and power switch
-    translate([-22.5,9,-7]) cube([wall+0.5,misc_hole_h,misc_hole_w]);
+    translate([-22.5,12,-7]) cube([2*wall,misc_hole_h,misc_hole_w]);
 
     translate([9,-10,-15]) cube([misc_hole_w,misc_hole_h,wall+0.5]);
 
+	
     //motor hole
-    translate([-65,-66,-motor_z/2]) rotate([0,0,grip_angle])   cube([motor_x,motor_y,motor_z]);
-    //wires fir the motor
-    translate([-60+motor_x,-77+motor_y,0]) cube([10,5,5]);
+	motor_pos_x=-67;
+	motor_pos_y=-73;
+    translate([motor_pos_x,motor_pos_y,-motor_z/2]) rotate([0,0,grip_angle])   
+		intersection() {
+			cube([motor_x,motor_y,motor_z]);
+			translate([motor_x/2,0,+motor_z/2])
+			rotate([-90,0,0])
+				cylinder(d=motor_z,h=motor_y);
+		}
+
+	//wires for the motor
+    translate([motor_pos_x+5+motor_x,motor_pos_y-11+motor_y,-5]) cube([20,5,5]);
     
+	// The sight bevel
     translate([0,1.5*wall,0])sight_cube();
+
+	// acrylic insert in sight
+	translate([acrylic_x,acrylic_y,-acrylic_thick/2])
+		cube([acrylic_size_x,acrylic_size_y,acrylic_thick]);
 }
 
 // Overall laser (as a monolithic block)
